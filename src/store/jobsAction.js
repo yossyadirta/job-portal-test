@@ -1,4 +1,11 @@
-import { FETCH_JOBS, FETCH_DETAIL_JOB, LOADING } from "./action";
+import {
+  FETCH_JOBS,
+  FETCH_MORE_JOBS,
+  FETCH_DETAIL_JOB,
+  LOADING,
+  LOADING_INFINITE_SCROLL,
+  ERROR,
+} from "./action";
 
 export function setLoading(payload) {
   return (dispatch) => {
@@ -6,16 +13,13 @@ export function setLoading(payload) {
   };
 }
 
-export function fetchJobs(search, fulltime, page) {
-  if (
-    !page &&
-    !fulltime &&
-    (!search.searchJobLocation || !search.searchJobTitle)
-  ) {
-    page = 1;
-  }
+export function setLoadingInfiniteScroll(payload) {
+  return (dispatch) => {
+    dispatch({ type: LOADING_INFINITE_SCROLL, payload });
+  };
+}
 
-  let page_url = `?page=${page}`;
+export function fetchJobs(search, fulltime) {
   let jobTitle_url = "";
   let jobLocation_url = "";
   let fulltime_url = "false";
@@ -23,7 +27,6 @@ export function fetchJobs(search, fulltime, page) {
 
   if (fulltime || search.searchJobLocation || search.searchJobTitle) {
     let arr = [];
-    page_url = "?";
 
     if (search.searchJobTitle) {
       jobTitle_url = `description=${search.searchJobTitle}`;
@@ -53,7 +56,7 @@ export function fetchJobs(search, fulltime, page) {
 
   return (dispatch) => {
     fetch(
-      `http://dev3.dansmultipro.co.id/api/recruitment/positions.json${page_url}${search_url}`
+      `http://dev3.dansmultipro.co.id/api/recruitment/positions.json?page=1&${search_url}`
     )
       .then((res) => {
         if (!res.ok) {
@@ -62,11 +65,30 @@ export function fetchJobs(search, fulltime, page) {
         return res.json();
       })
       .then((data) => dispatch({ type: FETCH_JOBS, payload: data }))
-      .catch((error) => {
-        console.log(error);
-      })
+      .catch((error) => dispatch({ type: ERROR, payload: error }))
       .finally(() => {
         dispatch(setLoading(false));
+      });
+  };
+}
+
+export function fetchMoreJobs(page) {
+  return (dispatch) => {
+    fetch(
+      `http://dev3.dansmultipro.co.id/api/recruitment/positions.json?page=${page}`
+    )
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error({ msg: "Error Fetch" });
+        }
+        return res.json();
+      })
+      .then((data) => dispatch({ type: FETCH_MORE_JOBS, payload: data }))
+      .catch((error) => {
+        dispatch({ type: ERROR, payload: { error } });
+      })
+      .finally(() => {
+        dispatch(setLoadingInfiniteScroll(false));
       });
   };
 }

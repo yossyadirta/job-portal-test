@@ -1,24 +1,22 @@
 import JobListRow from "../components/JobListRow";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchJobs } from "../store/jobsAction";
+import { fetchJobs, fetchMoreJobs } from "../store/jobsAction";
 import Loading from "../components/Loading.jsx";
+import LoadingInfiniteScroll from "../components/LoadingInfiniteScroll";
 
 export default function Home() {
-  const { jobs, loading } = useSelector((state) => state.jobs);
   const dispatch = useDispatch();
+  const { jobs, loading, loadingInfiniteScroll, error } = useSelector(
+    (state) => state.jobs
+  );
 
   const [filterFullTime, setFilterFullTime] = useState(false);
-
   const [inputSearch, setInputSearch] = useState({
     searchJobTitle: "",
     searchJobLocation: "",
   });
-
-  const listInnerRef = useRef();
   const [currPage, setCurrPage] = useState(1);
-  // const [prevPage, setPrevPage] = useState(0);
-  // const [lastList, setLastList] = useState(false);
 
   const handleChange = (event) => {
     const value = event.target.value;
@@ -36,28 +34,39 @@ export default function Home() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    dispatch(fetchJobs(inputSearch, filterFullTime, currPage));
+    dispatch(fetchJobs(inputSearch, filterFullTime));
   };
 
-  const handleMoreJobsButton = (event) => {
-    event.preventDefault();
-    setCurrPage(currPage + 1);
-    dispatch(fetchJobs(inputSearch, filterFullTime, currPage));
-  };
+  useEffect(() => {
+    if (currPage !== 1) {
+      dispatch(fetchMoreJobs(currPage));
+    } else {
+      dispatch(fetchJobs(inputSearch, filterFullTime));
+    }
 
-  const onScroll = () => {
-    if (listInnerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current;
-      if (scrollTop + clientHeight === scrollHeight) {
-        setCurrPage(currPage + 1);
-      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputSearch, filterFullTime, currPage]);
+
+  const handleScroll = () => {
+    let height = document.documentElement.scrollHeight;
+    let top = document.documentElement.scrollTop;
+    let windowHeight = window.innerHeight;
+
+    if (windowHeight + top + 1 >= height) {
+      setCurrPage((prev) => {
+        if (error.error) {
+          return prev;
+        } else {
+          return prev + 1;
+        }
+      });
     }
   };
 
   useEffect(() => {
-    dispatch(fetchJobs(inputSearch, filterFullTime, currPage));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputSearch, filterFullTime, currPage]);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  });
 
   if (loading) {
     return <Loading />;
@@ -124,23 +133,15 @@ export default function Home() {
       <div className="bg-white w-full p-6 shadow-lg mb-16">
         <h1 className="text-2xl font-bold">Job List</h1>
         <hr className="mt-6" />
-        {jobs?.map((job) => {
-          return (
-            <JobListRow
-              key={job?.id}
-              job={job}
-              onScroll={onScroll}
-              listInnerRef={listInnerRef}
-            />
-          );
+        {jobs?.map((job, index) => {
+          return <JobListRow key={index} job={job} />;
         })}
 
-        {jobs?.length < 10 ? (
-          ""
+        {error.error ? (
+          <>{loadingInfiniteScroll && <LoadingInfiniteScroll />}</>
         ) : (
           <div className="pt-4 ">
             <button
-              onClick={handleMoreJobsButton}
               type="button"
               className="mb-2 w-full inline-block px-6 py-2.5 bg-[#427FBE] text-white font-medium text-xs leading-normal uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg transition duration-150 ease-in-out"
             >
