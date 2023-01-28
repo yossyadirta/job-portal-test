@@ -64,13 +64,13 @@ export default function Home() {
   }
 
   return (
-    <div className="flex-col py-4 pt-8 px-40 text-left">
-      <div className="py-12 pt-24 ">
+    <div className="flex-col py-4 pt-8 px-40 handphone:m-0 handphone:py-0 handphone:pt-8 handphone:px-16 text-left">
+      <div className="py-12 pt-24">
         <form
           onSubmit={handleSubmit}
-          className="flex flex-row justify-between items-end"
+          className="flex flex-row handphone:flex-wrap justify-between items-end"
         >
-          <div className="flex flex-col">
+          <div className="flex flex-col handphone:w-full">
             <label className="pb-2 font-semibold">Job Description</label>
             <input
               type="text"
@@ -81,7 +81,7 @@ export default function Home() {
               placeholder="Search for a job title"
             />
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col handphone:w-full">
             <label className="pb-2 font-semibold">Location</label>
             <input
               type="text"
@@ -92,7 +92,7 @@ export default function Home() {
               placeholder="Search for a job title"
             />
           </div>
-          <div className="flex flex-col justify-center">
+          <div className="flex flex-col justify-center handphone:w-full">
             <div>
               <div className="form-check">
                 <input
@@ -114,7 +114,7 @@ export default function Home() {
           </div>
           <button
             type="submit"
-            className="p-2.5 px-4 text-md font-medium text-white bg-[#0086FF] rounded-md border border-[#1b83dd] hover:bg-[#1b83dd] focus:ring-4 focus:outline-none focus:ring-[#1b83dd]"
+            className="p-2.5 px-4 text-md font-medium text-white bg-[#0086FF] rounded-md border border-[#1b83dd] hover:bg-[#1b83dd] focus:ring-4 focus:outline-none focus:ring-[#1b83dd] handphone:mt-4"
           >
             Search
             <span className="sr-only">Search</span>

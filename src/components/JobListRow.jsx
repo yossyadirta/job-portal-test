@@ -6,7 +6,7 @@ export default function JobListRow({ onScroll, listInnerRef, job }) {
 
   return (
     <div
-      className="flex py-4 border-b justify-between"
+      className="flex flex-wrap py-4 border-b justify-between"
       onScroll={onScroll}
       ref={listInnerRef}
     >
@@ -20,20 +20,21 @@ export default function JobListRow({ onScroll, listInnerRef, job }) {
             </Link>
 
             <div className="flex flex-wrap items-center">
-              <div className="flex items-center mb-2 mr-2 text-sm text-gray-300 md:mb-0 hover:text-gray-700">
-                <p className="inline-block mb-2 text-md font-semibold text-gray-400 hover:text-blue-600 mt-2">
+              <div className="flex items-center mb-2 mr-2 text-sm text-gray-300 md:mb-0 hover:text-gray-700 handphone:w-full">
+                <p className="inline-block mb-2 text-md font-semibold text-gray-400 hover:text-blue-600 mt-2 ">
                   {job?.company}
                 </p>
               </div>
-              <p className="text-lg text-gray-400">-</p>
-              <div className="flex items-center mb-2 mr-4 text-sm text-[#60A345] md:mb-0 hover:text-gray-700 font-semibold">
-                <p className="pl-1">{job?.type}</p>
+              <p className="text-lg text-gray-400 handphone:hidden">-</p>
+              <div className="flex items-center mb-2 mr-4 text-sm text-[#60A345] md:mb-0 hover:text-gray-700 font-semibold handphone:mr-0">
+                <p className="pl-1 handphone:pl-0">{job?.type}</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div className="flex flex-col text-right">
+
+      <div className="flex flex-col text-right handphone:text-left">
         <p>{job?.location}</p>
         <p className="mt-2 text-gray-400">{date}</p>
       </div>
